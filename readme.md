@@ -2,7 +2,7 @@
 
 Use CycleGAN to transform **gray MNIST** to **colorful MNIST**.
 
----
+
 
 ## Prepare Data
 
@@ -36,7 +36,7 @@ reconstruct loss | G&D loss A | G&D loss B |
 :---: | :---: | :---:
 <img src="figs/cyclegan/reconstruct_loss.png" width=400px> | <img src="figs/cyclegan/GD_loss_A.png" width=400px> | <img src="figs/cyclegan/GD_loss_B.png" width=400px>
 
----
+
 
 ## Reference
 
