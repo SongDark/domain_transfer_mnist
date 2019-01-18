@@ -53,3 +53,14 @@ class CNN_Discriminator(BasicBlock):
 
             return yd, net
 
+class CNN_Latent_discriminator(BasicBlock):
+    def __init__(self, name=None):
+        super(CNN_Latent_discriminator, self).__init__(None, name or "CNN_Latent_discriminator")
+    
+    def __call__(self, x, is_training=True, reuse=False):
+        with tf.variable_scope(self.name, reuse=reuse):
+
+            c1 = lrelu(bn(conv2d(x, 64, 3, 3, 2, 2, padding='SAME', name='d_c1'), is_training, name='d_b1'), name='d_l1')
+            c2 = conv2d(c1, 1, 3, 3, 2, 2, padding='SAME', name='d_c2') # [bz, 4, 4, 1]
+
+        return c2

@@ -32,27 +32,36 @@ class CNN_Generator(BasicBlock):
         super(CNN_Generator, self).__init__(None, name or "CNN_Generator")
         self.output_dim = output_dim
 
-    def __call__(self, x, is_training=True, reuse=False):
+    def __call__(self, x, y=None, decode_mode=False, is_training=True, reuse=False):
         with tf.variable_scope(self.name, reuse=reuse):
-            pad_x = tf.pad(x, [[0,0],[3,3],[3,3],[0,0]], "REFLECT")
-            c1 = tf.nn.relu(bn(conv2d(pad_x, 32, 7, 7, 1, 1, padding="VALID", name="g_c1"), is_training, name='g_bn1'))
-            c2 = tf.nn.relu(bn(conv2d(c1, 64, 3, 3, 2, 2, padding="SAME", name="g_c2"), is_training, name='g_bn2'))
-            c3 = tf.nn.relu(bn(conv2d(c2, 128, 3, 3, 2, 2, padding="SAME", name='g_c3'), is_training, name='g_bn3'))
+            if y is not None:
+                batch_size, ydim = y.get_shape().as_list()
+                y = tf.reshape(y, [batch_size, 1, 1, ydim])
+                x = conv_cond_concat(x, y)
+            
+            if decode_mode:
+                emb = x
+            else:
+                pad_x = tf.pad(x, [[0,0],[3,3],[3,3],[0,0]], "REFLECT")
+                c1 = tf.nn.relu(bn(conv2d(pad_x, 32, 7, 7, 1, 1, padding="VALID", name="g_c1"), is_training, name='g_bn1'))
+                c2 = tf.nn.relu(bn(conv2d(c1, 64, 3, 3, 2, 2, padding="SAME", name="g_c2"), is_training, name='g_bn2'))
+                c3 = tf.nn.relu(bn(conv2d(c2, 128, 3, 3, 2, 2, padding="SAME", name='g_c3'), is_training, name='g_bn3'))
 
-            r1 = resnet_block(c3, 128, is_training, name='r1')
-            r2 = resnet_block(r1, 128, is_training, name='r2') 
-            r3 = resnet_block(r2, 128, is_training, name='r3') 
-            r4 = resnet_block(r3, 128, is_training, name='r4')
-            r5 = resnet_block(r4, 128, is_training, name='r5')
-            r6 = resnet_block(r5, 128, is_training, name='r6')
+                r1 = resnet_block(c3, 128, is_training, name='r1')
+                r2 = resnet_block(r1, 128, is_training, name='r2') 
+                r3 = resnet_block(r2, 128, is_training, name='r3') 
+                r4 = resnet_block(r3, 128, is_training, name='r4')
+                r5 = resnet_block(r4, 128, is_training, name='r5')
+                r6 = resnet_block(r5, 128, is_training, name='r6')
+                emb = r6 
 
-            d1 = tf.nn.relu(bn(deconv2d(r6, 64, 3, 3, 2, 2, padding="SAME", name='g_dc1'), is_training, name='g_bn4'))
+            d1 = tf.nn.relu(bn(deconv2d(emb, 64, 3, 3, 2, 2, padding="SAME", name='g_dc1'), is_training, name='g_bn4'))
             d2 = tf.nn.relu(bn(deconv2d(d1, 32, 3, 3, 2, 2, padding="SAME", name='g_dc2'), is_training, name='g_bn5'))
             d2_pad = tf.pad(d2, [[0,0],[3,3],[3,3],[0,0]], "REFLECT")
             c4 = bn(conv2d(d2_pad, self.output_dim, 7, 7, 1, 1, padding="VALID", name="g_c4"), is_training, name='g_bn6')
             
             out = tf.nn.sigmoid(c4)
-        return out
+        return out, emb
 
 
 # G = CNN_Generator(output_dim=3)
