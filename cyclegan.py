@@ -48,18 +48,18 @@ class CycleGAN(BasicTrainFramework):
 
     def build_network(self):
         # cyclegan
-        self.fake_B = self.generator_AtoB(self.source_A, is_training=True, reuse=False)
-        self.fake_A = self.generator_BtoA(self.source_B, is_training=True, reuse=False)
-        self.fake_B_test = self.generator_AtoB(self.source_A, is_training=False, reuse=True)
-        self.fake_A_test = self.generator_BtoA(self.source_B, is_training=False, reuse=True)
+        self.fake_B, _ = self.generator_AtoB(self.source_A, is_training=True, reuse=False)
+        self.fake_A, _ = self.generator_BtoA(self.source_B, is_training=True, reuse=False)
+        self.fake_B_test, _ = self.generator_AtoB(self.source_A, is_training=False, reuse=True)
+        self.fake_A_test, _ = self.generator_BtoA(self.source_B, is_training=False, reuse=True)
 
         self.logit_real_A, _ = self.discriminator_A(self.source_A, is_training=True, reuse=False)
         self.logit_real_B, _ = self.discriminator_B(self.source_B, is_training=True, reuse=False)
         self.logit_fake_A, _ = self.discriminator_A(self.fake_A, is_training=True, reuse=True)
         self.logit_fake_B, _ = self.discriminator_B(self.fake_B, is_training=True, reuse=True)
 
-        self.cyc_A = self.generator_BtoA(self.fake_B, is_training=True, reuse=True)
-        self.cyc_B = self.generator_AtoB(self.fake_A, is_training=True, reuse=True)
+        self.cyc_A, _ = self.generator_BtoA(self.fake_B, is_training=True, reuse=True)
+        self.cyc_B, _ = self.generator_AtoB(self.fake_A, is_training=True, reuse=True)
 
     def build_optimizer(self):
         # self.reconstruct_loss = mse(self.fake_A, self.source_A, self.batch_size)

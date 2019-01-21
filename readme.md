@@ -77,3 +77,4 @@ Epoch 0 | Epoch 10 | Epoch 19
 
 1. [Understanding and Implementing CycleGAN in TensorFlow](https://hardikbansal.github.io/CycleGANBlog/)
 2. [CycleGAN-tensorflow](https://github.com/hardikbansal/CycleGAN/)
+3. [WGAN Domain Adaptation for EEG-Based Emotion Recognition](https://link.springer.com/chapter/10.1007/978-3-030-04221-9_25)
